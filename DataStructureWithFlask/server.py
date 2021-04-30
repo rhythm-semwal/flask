@@ -4,6 +4,7 @@ from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from DataStructureWithFlask.linkedlist import LinkedList
 
 # app
 app = Flask(__name__)
@@ -54,7 +55,7 @@ def create_user():
         name=data["name"],
         email=data['email'],
         address=data["address"],
-        phone = data["phone"]
+        phone=data["phone"]
     )
 
     # inserting new user in the db
@@ -66,7 +67,20 @@ def create_user():
 
 @app.route('/user/descending_id', methods=['GET'])
 def get_user_descending():
-    pass
+    users = User.query.all()
+    user_ll = LinkedList()
+
+    for user in users:
+        user_ll.insert_beginning(
+            {
+                "id": user.id,
+                "name" : user.name,
+                "email" : user.email,
+                "address" : user.address,
+                "phone" : user.phone
+        })
+
+    return jsonify(user_ll.to_list()), 200
 
 
 @app.route('/user/ascending_id', methods=['GET'])
