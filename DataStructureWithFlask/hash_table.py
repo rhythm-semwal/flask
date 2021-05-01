@@ -87,3 +87,4 @@ class HashTable:
                 print(f"[{index}] {value}")
 
         print("}")
+
