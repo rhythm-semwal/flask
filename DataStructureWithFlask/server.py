@@ -155,7 +155,6 @@ def create_blog_post(user_id):
     return jsonify({"message": "new blog post created"}), 200
 
 
-
 @app.route('/user/<user_id>', methods=['GET'])
 def get_all_blog_post(user_id):
     pass
