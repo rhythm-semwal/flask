@@ -5,6 +5,7 @@ from sqlalchemy.engine import Engine
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from DataStructureWithFlask.linkedlist import LinkedList
+from DataStructureWithFlask.hash_table import HashTable
 
 # app
 app = Flask(__name__)
@@ -69,7 +70,7 @@ def create_user():
 def get_user_descending():
     users = User.query.all()
     user_ll = LinkedList()
-
+    print(users)
     for user in users:
         user_ll.insert_beginning(
             {
@@ -85,22 +86,73 @@ def get_user_descending():
 
 @app.route('/user/ascending_id', methods=['GET'])
 def get_user_ascending():
-    pass
+    users = User.query.all()
+    user_ll = LinkedList()
+
+    for user in users:
+        user_ll.insert_at_end(
+            {
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "address": user.address,
+                "phone": user.phone
+            })
+
+    return jsonify(user_ll.to_list()), 200
 
 
 @app.route('/user/<user_id>', methods=['GET'])
 def get_user(user_id):
-    pass
+    user_id = int(user_id)
+    users = User.query.all()
+
+    user_ll = LinkedList()
+
+    for user in users:
+        user_ll.insert_beginning({
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "address": user.address,
+            "phone": user.phone
+        })
+
+    required_user = user_ll.get_user_by_id(user_id)
+    return jsonify(required_user), 200
 
 
-@app.route('/user/ascending_id', methods=['DELETE'])
+@app.route('/user/<user_id>', methods=['DELETE'])
 def delete_user(user_id):
-    pass
+    user = User.query.filter_by(id=user_id).first()
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({}), 200
 
 
-@app.route('/user/<user_id>', methods=['POST'])
+@app.route('/blog_post/<user_id>', methods=['POST'])
 def create_blog_post(user_id):
-    pass
+    data = request.get_json()
+
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({"message": "User does not exist"}), 400
+
+    ht = HashTable(10)
+    ht.add_key_value("title", data["title"])
+    ht.add_key_value("body", data["body"])
+    ht.add_key_value("date", now)
+    ht.add_key_value("user_id", user_id)
+
+    new_blog_post = BlogPost(
+        title=ht.get_value("title"),
+        body=ht.get_value("body"),
+        date=ht.get_value("date"),
+        user_id=ht.get_value("user_id"),
+    )
+    db.session.add(new_blog_post)
+    db.session.commit()
+    return jsonify({"message": "new blog post created"}), 200
 
 
 @app.route('/user/<user_id>', methods=['GET'])

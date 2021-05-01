@@ -65,6 +65,18 @@ class LinkedList:
         self.last_node.next = Node(data)
         self.last_node = self.last_node.next
 
+    def get_user_by_id(self, user_id):
+        current = self.head
+
+        while current:
+            if current.data['id'] == user_id:
+                return current.data
+
+            current = current.next
+
+        return None
+
+
 
 ll = LinkedList()
 ll.insert_beginning("data")
