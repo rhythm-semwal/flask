@@ -159,6 +159,9 @@ def create_blog_post(user_id):
 
 @app.route('/blog_post/<blog_post_id>', methods=['GET'])
 def get_all_blog_post(blog_post_id):
+    if type(blog_post_id) == str:
+        return jsonify({"message":"Blog post id should be integer. Please check your input"})
+
     blog_posts = BlogPost.query.all()
     """
     shuffling the blogs because they are not retrieved from the database in the ascending order and this would make the
