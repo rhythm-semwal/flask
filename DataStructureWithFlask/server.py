@@ -6,6 +6,8 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from DataStructureWithFlask.linkedlist import LinkedList
 from DataStructureWithFlask.hash_table import HashTable
+from DataStructureWithFlask.binary_search_tree import BinarySearchTree
+import random
 
 # app
 app = Flask(__name__)
@@ -155,9 +157,31 @@ def create_blog_post(user_id):
     return jsonify({"message": "new blog post created"}), 200
 
 
-@app.route('/user/<user_id>', methods=['GET'])
-def get_all_blog_post(user_id):
-    pass
+@app.route('/blog_post/<blog_post_id>', methods=['GET'])
+def get_all_blog_post(blog_post_id):
+    blog_posts = BlogPost.query.all()
+    """
+    shuffling the blogs because they are not retrieved from the database in the ascending order and this would make the
+    BST not properly balanced
+    """
+
+    random.shuffle(blog_posts)
+
+    bst = BinarySearchTree()
+
+    for post in blog_posts:
+        bst.insert({
+            "id": post.id,
+            "title": post.title,
+            "body": post.body,
+            "user_id": post.user_id
+        })
+
+    post = bst.search(int(blog_post_id))
+    if not post:
+        return jsonify({"message":"Post not found"})
+
+    return jsonify(post)
 
 
 @app.route('/blog_post/<blog_post_id>', methods=['GET'])
